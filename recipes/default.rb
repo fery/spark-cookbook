@@ -31,5 +31,6 @@ execute "untar spark" do
 end
 
 execute "move spark" do
-  command "mv -rf #{Chef::Config[:file_cache_path]}/#{node[:spark][:version]} #{node[:spark][:home]}"
+  command "mv #{Chef::Config[:file_cache_path]}/#{node[:spark][:version]} #{node[:spark][:home]}"
+  not_if { ::Dir.exists?(node[:spark][:home]) }
 end
