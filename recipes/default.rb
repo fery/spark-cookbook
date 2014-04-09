@@ -19,17 +19,18 @@ node.default[:scala][:url] = "http://www.scala-lang.org/files/archive/scala-2.10
 include_recipe "scala::default"
 
 spark_tar = Chef::Config[:file_cache_path] + "/spark.tar.gz"
+unless Dir.exists?(node[:spark][:home])
+  remote_file spark_tar do
+    source node[:spark][:repository]
+    mode "0644"
+  end
 
-remote_file spark_tar do
-  source node[:spark][:repository]
-  mode "0644"
-end
+  execute "untar spark" do
+    cwd Chef::Config[:file_cache_path]
+    command "tar xzvf " + spark_tar
+  end
 
-execute "untar spark" do
-  cwd Chef::Config[:file_cache_path]
-  command "tar xzvf " + spark_tar
-end
-
-execute "move spark" do
-  command "mv -rf #{Chef::Config[:file_cache_path]}/#{node[:spark][:version]} #{node[:spark][:home]}"
+  execute "move spark" do
+    command "mv -f #{Chef::Config[:file_cache_path]}/#{node[:spark][:version]} #{node[:spark][:home]}"
+  end
 end
